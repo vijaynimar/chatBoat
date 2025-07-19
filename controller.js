@@ -58,7 +58,20 @@ export const choosePath = async (req, res) => {
           await sendExerciseTypeTemplate(userPhone);
         }
       }
+    if (["a", "b", "c", "d"].includes(payload)) {
+      // You can respond accordingly
+      if (payload === "a") {
+        console.log("🔥 User chose Fat Loss");
+      } else if (payload === "b") {
+        console.log("💪 User chose Muscle Gain");
+      } else if (payload === "c") {
+        console.log("🧘‍♂️ User chose Yoga");
+      } else if (payload === "d") {
+        console.log("🏃 User chose Cardio");
+      }
 
+      // Here you can store their choice in DB or send a welcome message
+    }
       return res.sendStatus(200);
     } catch (err) {
       console.error("Webhook error:", err.message);
