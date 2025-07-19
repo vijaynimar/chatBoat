@@ -41,7 +41,6 @@ export const sendTemplateMessage = async (RECIPIENT_PHONE) => {
     console.error("❌ Error sending template:", err.response?.data || err.message);
   }
 };
-
 export const sendExerciseTypeTemplate = async (recipientPhone) => {
   const url = `https://graph.facebook.com/v19.0/${PHONE_NUMBER_ID}/messages`;
 
@@ -50,8 +49,34 @@ export const sendExerciseTypeTemplate = async (recipientPhone) => {
     to: recipientPhone,
     type: "template",
     template: {
-      name: "activity", // 👈 your 2nd template name
-      language: { code: "en_US" }
+      name: "activity", // 👈 Template name registered on WhatsApp Manager
+      language: { code: "en_US" },
+      components: [
+        {
+          type: "button",
+          sub_type: "quick_reply",
+          index: "0",
+          parameters: [{ type: "payload", payload: "a" }]
+        },
+        {
+          type: "button",
+          sub_type: "quick_reply",
+          index: "1",
+          parameters: [{ type: "payload", payload: "b" }]
+        },
+        {
+          type: "button",
+          sub_type: "quick_reply",
+          index: "2",
+          parameters: [{ type: "payload", payload: "c" }]
+        },
+        {
+          type: "button",
+          sub_type: "quick_reply",
+          index: "3",
+          parameters: [{ type: "payload", payload: "d" }]
+        }
+      ]
     }
   };
 
