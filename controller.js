@@ -25,28 +25,51 @@ export const createUser=async(req,res)=>{
 }
 
 
-export const choosePath=async()=>async (req, res) => {
-    console.log("choose Path function called")
-  try {
-    const entry = req.body.entry?.[0];
-    const changes = entry?.changes?.[0];
-    const message = changes?.value?.messages?.[0];
+export const choosePath = async (req, res) => {
+  const VERIFY_TOKEN = "my_secret_token_987"; // replace with the token you set in Meta portal
 
-    const userPhone = message?.from;
-    const payload = message?.button?.payload;
+  // 1. Handle webhook verification (GET request)
+  if (req.method === "GET") {
+    const mode = req.query["hub.mode"];
+    const token = req.query["hub.verify_token"];
+    const challenge = req.query["hub.challenge"];
 
-    if (payload === "start") {
-        const update=await updateUser(phone)
-        if(update.status){
-            await sendExerciseTypeTemplate(userPhone); 
-        }
+    if (mode === "subscribe" && token === VERIFY_TOKEN) {
+      console.log("WEBHOOK_VERIFIED");
+      return res.status(200).send(challenge);
+    } else {
+      return res.sendStatus(403);
     }
-    res.sendStatus(200);
-  } catch (err) {
-    console.error("Webhook error:", err.message);
-    res.sendStatus(500);
   }
-}
+
+  // 2. Handle incoming messages (POST request)
+  if (req.method === "POST") {
+    try {
+      const entry = req.body.entry?.[0];
+      const changes = entry?.changes?.[0];
+      const message = changes?.value?.messages?.[0];
+
+      const userPhone = message?.from;
+      const payload = message?.button?.payload;
+
+      if (payload === "start") {
+        const update = await updateUser(userPhone);
+        if (update.status) {
+          await sendExerciseTypeTemplate(userPhone);
+        }
+      }
+
+      return res.sendStatus(200);
+    } catch (err) {
+      console.error("Webhook error:", err.message);
+      return res.sendStatus(500);
+    }
+  }
+
+  // 3. Invalid method
+  res.sendStatus(404);
+};
+
 
 const updateUser=async(phone)=>{
     try{
