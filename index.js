@@ -59,7 +59,7 @@ cron.schedule("*/1 * * * *", () => {
 // 🌐 Webhook to receive user replies
 app.post("/webhook", (req, res) => {
   const data = req.body;
-
+console.log("🔔 Webhook received:", JSON.stringify(data, null, 2));
   if (
     data.object === 'whatsapp_business_account' &&
     data.entry &&
