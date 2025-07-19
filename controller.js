@@ -60,14 +60,14 @@ export const choosePath = async (req, res) => {
       }
     if (["a", "b", "c", "d"].includes(payload)) {
       // You can respond accordingly
-      if (payload === "a") {
-        console.log("🔥 User chose Fat Loss");
+       if (payload === "a") {
+        await updateActivity(userPhone,"Physical Welbing")
       } else if (payload === "b") {
-        console.log("💪 User chose Muscle Gain");
+         await updateActivity(userPhone,"Nutritional Welbing")
       } else if (payload === "c") {
-        console.log("🧘‍♂️ User chose Yoga");
+         await updateActivity(userPhone,"Emotional Welbing")
       } else if (payload === "d") {
-        console.log("🏃 User chose Cardio");
+         await updateActivity(userPhone,"Social Welbing")
       }
 
       // Here you can store their choice in DB or send a welcome message
@@ -98,5 +98,21 @@ const updateUser=async(phone)=>{
     return { status: true };
     }catch(err){
         return res.status(500).json({message:"error in update User"})
+    }
+}
+
+const updateActivity=async(phone,activity)=>{
+    try{
+        const userDoc = await user.findOne({ phone });
+
+    if (!userDoc) {
+      return { status: false, message: "User not found" };
+    }
+
+    userDoc.selectedActivity = activity;
+    await userDoc.save();
+    return { status: true };
+    }catch(err){
+        return res.status(500).json({message:"error in updateActivity"})
     }
 }
