@@ -26,6 +26,7 @@ export const createUser=async(req,res)=>{
 
 
 export const choosePath=async()=>async (req, res) => {
+    console.log("choose Path function called")
   try {
     const entry = req.body.entry?.[0];
     const changes = entry?.changes?.[0];
