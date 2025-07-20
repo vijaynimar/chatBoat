@@ -1,7 +1,7 @@
 import "dotenv/config";
 import axios from "axios";
 
-const ACCESS_TOKEN = "EAAXDm2Rivn0BPDsZBeddmz47wfulBL7MZB7GlZB0gdcXDq4hEYNZC9WoxYyFu7IUtGZAQE13sE0nqkWZA9wZAFAh2FqXz2drXSvgDIu4VgaUmLtnpbXFGZCmtQKL47wsgX9EaHJHnprFxc5VuAZC3zEYEVg25QbZABBQ6aZBt7mZAzTkTRNQQTYvv54QZA603OsCPCrQHBS2XTAPbdLlBMk9cAssQByJUZBlIRLy40a4c5qcDhxRrOdzIZD";
+const ACCESS_TOKEN = "EAAXDm2Rivn0BPFq7VxZC2IOdKWu1aJZA7BRsQsYDZCZB05GYebZCYVXCLYBTuS042OZCkiB8BNir1IPF7keNgcgHjVApdI9fuJa0yZAiBjtC8xg9oZAJR2pdDpPXP0Jc0F3713wIvgWT10OUXkf8KEGT6jZCqm4iSN0DV8NR64g1nXZCgnZCpBEVHl8aFG14CAWbIns36sXNvQ7nv0fNWHIk2lLeJK725m9ZBXZBJ6VRuaZAaRIGnwKQYZD";
 const PHONE_NUMBER_ID = "639665239240564";
 
 export const sendTemplateMessage = async (RECIPIENT_PHONE) => {
@@ -90,5 +90,30 @@ export const sendExerciseTypeTemplate = async (recipientPhone) => {
     console.log("✅ Sent exercise type selection:", res.data);
   } catch (err) {
     console.error("❌ Error sending template:", err.response?.data || err.message);
+  }
+};
+
+export const sendTextMessage = async (recipientPhone, message) => {
+  const url = `https://graph.facebook.com/v19.0/${PHONE_NUMBER_ID}/messages`;
+
+  const data = {
+    messaging_product: "whatsapp",
+    to: recipientPhone,
+    type: "text",
+    text: {
+      body: `Your response is ${message} recieved`
+    }
+  };
+
+  try {
+    const res = await axios.post(url, data, {
+      headers: {
+        Authorization: `Bearer ${ACCESS_TOKEN}`,
+        "Content-Type": "application/json"
+      }
+    });
+    console.log("✅ Sent text message:", res.data);
+  } catch (err) {
+    console.error("❌ Error sending text message:", err.response?.data || err.message);
   }
 };
