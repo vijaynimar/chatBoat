@@ -184,11 +184,12 @@ const updateTimeSlot = async (phone, option) => {
       return { status: false, message: "User not found" };
     }
     if (userExist.timeSlot) {
-      await sendTextMessage(phone);
+      await sendTextMessage(phone,"This response is already exixts");
       return { status: false, message: "Time slot already set" };
     }
     userExist.timeSlot = option;
     await userExist.save();
+    await sendTextMessage(phone,"Thank you for taking up the initiative. #HealthyBeginnings")
     return { status: true };
   } catch (err) {
     console.log("Error in updateTimeSlot:", err);
@@ -204,7 +205,7 @@ const updateActivityOption = async (phone, option) => {
       return { status: false, message: "User not found" };
     }
     if (userExist.activityOption) {
-      await sendTextMessage(phone);
+      await sendTextMessage(phone,"This response is already exixts");
       return { status: false, message: "Activity option already set" };
     }
     userExist.activityOption = option;
@@ -239,7 +240,7 @@ const updateActivity = async (phone, activity) => {
       return { status: false, message: "User not found" };
     }
     if (userDoc.selectedActivity) {
-      await sendTextMessage(phone);
+      await sendTextMessage(phone,"This response is already exixts");
       return { status: false, message: "Activity already selected" };
     }
     userDoc.selectedActivity = activity;
