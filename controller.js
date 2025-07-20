@@ -1,5 +1,5 @@
 import {user} from "./userModel.js"
-import { sendTemplateMessage ,sendExerciseTypeTemplate} from "./chatBoat.js"
+import { sendTemplateMessage ,sendExerciseTypeTemplate,sendTextMessage} from "./chatBoat.js"
 
 export const createUser=async(req,res)=>{
     const {phone,name,city} =req.body
@@ -111,6 +111,7 @@ const updateActivity=async(phone,activity)=>{
 
     userDoc.selectedActivity = activity;
     await userDoc.save();
+    await sendTextMessage(phone,activity)
     return { status: true };
     }catch(err){
         return res.status(500).json({message:"error in updateActivity"})
