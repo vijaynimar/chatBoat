@@ -37,6 +37,7 @@ export const sendTemplateMessage = async (RECIPIENT_PHONE) => {
       }
     });
     console.log("✅ Template sent:", res.data);
+     return { status: true, data: res.data }
   } catch (err) {
     console.error("❌ Error sending template:", err.response?.data || err.message);
   }
@@ -114,6 +115,7 @@ export const sendTextMessage = async (recipientPhone, message) => {
       }
     });
     console.log("✅ Sent text message:", res.data);
+     return { status: true, data: res.data }
   } catch (err) {
     console.error("❌ Error sending text message:", err.response?.data || err.message);
   }
@@ -166,6 +168,7 @@ export const sendActivityTypeTemplate = async (recipientPhone) => {
       }
     });
     console.log("✅ Sent exercise type selection:", res.data);
+     return { status: true, data: res.data }
   } catch (err) {
     console.error("❌ Error sending template:", err.response?.data || err.message);
   }
@@ -212,13 +215,13 @@ export const sendNutritionActivityTypeTemplate = async (recipientPhone) => {
         {
           type: "button",
           sub_type: "quick_reply",
-          index: "2",
+          index: "4",
           parameters: [{ type: "payload", payload: "nutrition_e" }]
         },
         {
           type: "button",
           sub_type: "quick_reply",
-          index: "3",
+          index: "5",
           parameters: [{ type: "payload", payload: "nutrition_f" }]
         }
       ]
@@ -233,6 +236,7 @@ export const sendNutritionActivityTypeTemplate = async (recipientPhone) => {
       }
     });
     console.log("✅ Sent exercise type selection:", res.data);
+     return { status: true, data: res.data }
   } catch (err) {
     console.error("❌ Error sending template:", err.response?.data || err.message);
   }
@@ -284,6 +288,7 @@ export const emotionalTemplate=async(recipientPhone)=>{
       }
     });
     console.log("✅ Sent exercise type selection:", res.data);
+     return { status: true, data: res.data }
     }catch(err){
       console.log("error in emotional template",err);
     }
@@ -341,6 +346,7 @@ export const socialTemplate=async(recipientPhone)=>{
       }
     });
     console.log("✅ Sent exercise type selection:", res.data);
+     return { status: true, data: res.data }
     }catch(err){
       console.log("error in emotional template",err);
     }
@@ -405,6 +411,7 @@ export const timeSlot=async(recipientPhone)=>{
       }
     });
     console.log("✅ Sent exercise type selection:", res.data);
+     return { status: true, data: res.data }
     }catch(err){
       console.log("error in emotional template",err);
     }
