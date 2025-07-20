@@ -25,7 +25,7 @@ export const createUser=async(req,res)=>{
         await sendTemplateMessage(phone)
         return res.status(201).json({message:"user created sucessfully"})
     }catch(err){
-        return res.status(500).json({nessage:"error in create user"})
+        return res.status(500).json({message:"error in create user"})
     }
 }
 
@@ -96,7 +96,7 @@ export const choosePath = async (req, res) => {
               switch (option) {
                 case "a":
                   activityLabel = "Yoga";
-                  break;
+                  break
                 case "b":
                   activityLabel = "Sport";
                   break;
@@ -172,6 +172,7 @@ export const choosePath = async (req, res) => {
                   break;
                 case "d":
                   activityLabel = "Drink Water";
+                  break
                 case "e":
                   activityLabel = "Mindfully for One Meal";  
                   break;
@@ -222,34 +223,55 @@ export const choosePath = async (req, res) => {
   res.sendStatus(404);
 };
 
-const updateTimeSlot=async(phone,option)=>{
-  try{
-    const userExist=await user.findOne({phone})
-    if(userExist.timeSlot){
-      await sendTextMessage(phone)
-      return
-    }
-    await user.updateOne({phone},{$set:{timeSlot:option}})
-    return{status:true}
-  }catch(err){
-    console.log("error in updateTimeSLot",err);
-  }
-}
+const updateTimeSlot = async (phone, option) => {
+  try {
+    const userExist = await user.findOne({ phone });
 
-const updateActivityOption=async(phone,option)=>{
-  try{
-    const userExist=await user.findOne({phone:phone})
-    if(userExist.activityOption){
-      await sendTextMessage(phone)
-      return
+    if (!userExist) {
+      console.log("User not found");
+      return { status: false, message: "User not found" };
     }
-    await user.updateOne({phone:phone},{$set:{activityOption:option}})
-    await timeSlot(phone)
-    return {status:true}
-  }catch(err){
-    console.log("error in update Activity option",err);
+
+    if (userExist.timeSlot) {
+      await sendTextMessage(phone);
+      return;
+    }
+
+    userExist.timeSlot = option;
+    await userExist.save();
+    return { status: true };
+  } catch (err) {
+    console.log("Error in updateTimeSlot:", err);
+    return { status: false, message: "Error in updateTimeSlot" };
   }
-}
+};
+
+const updateActivityOption = async (phone, option) => {
+  try {
+    const userExist = await user.findOne({ phone });
+
+    if (!userExist) {
+      console.log("User not found");
+      return { status: false, message: "User not found" };
+    }
+
+    if (userExist.activityOption) {
+      await sendTextMessage(phone);
+      return;
+    }
+
+    userExist.activityOption = option;
+    await userExist.save();
+
+    // Ask user for time slot after setting activity option
+    await timeSlot(phone);
+
+    return { status: true };
+  } catch (err) {
+    console.log("Error in updateActivityOption:", err);
+    return { status: false, message: "Error in updateActivityOption" };
+  }
+};
 
 const updateUser=async(phone)=>{
     try{
