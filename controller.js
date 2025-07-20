@@ -1,5 +1,5 @@
 import {user} from "./userModel.js"
-import { sendTemplateMessage ,sendExerciseTypeTemplate,sendTextMessage} from "./chatBoat.js"
+import { sendTemplateMessage ,sendExerciseTypeTemplate,sendTextMessage,sendActivityTypeTemplate} from "./chatBoat.js"
 
 export const createUser=async(req,res)=>{
     const {phone,name,city} =req.body
@@ -58,20 +58,37 @@ export const choosePath = async (req, res) => {
           await sendExerciseTypeTemplate(userPhone);
         }
       }
-    if (["a", "b", "c", "d"].includes(payload)) {
-      // You can respond accordingly
-       if (payload === "a") {
-        await updateActivity(userPhone,"Physical Welbing")
-      } else if (payload === "b") {
-         await updateActivity(userPhone,"Nutritional Welbing")
-      } else if (payload === "c") {
-         await updateActivity(userPhone,"Emotional Welbing")
-      } else if (payload === "d") {
-         await updateActivity(userPhone,"Social Welbing")
-      }
 
-      // Here you can store their choice in DB or send a welcome message
-    }
+        if (payload) {
+          const [template, option] = payload.split("_");
+
+          console.log("📩 User responded to template:", template);
+          console.log("✅ User chose option:", option);
+
+          if (template === "activity") {
+            let activityLabel = "";
+
+            switch (option) {
+              case "a":
+                activityLabel = "Physical Wellbeing";
+                break;
+              case "b":
+                activityLabel = "Nutritional Wellbeing";
+                break;
+              case "c":
+                activityLabel = "Emotional Wellbeing";
+                break;
+              case "d":
+                activityLabel = "Social Wellbeing";
+                break;
+            }
+
+            if (activityLabel) {
+              await updateActivity(userPhone, activityLabel);
+            }
+          }
+        }
+
       return res.sendStatus(200);
     } catch (err) {
       console.error("Webhook error:", err.message);
@@ -97,7 +114,7 @@ const updateUser=async(phone)=>{
 
     return { status: true };
     }catch(err){
-        return res.status(500).json({message:"error in update User"})
+        console.log("error in updateUser");
     }
 }
 
@@ -112,8 +129,11 @@ const updateActivity=async(phone,activity)=>{
     userDoc.selectedActivity = activity;
     await userDoc.save();
     await sendTextMessage(phone,activity)
+    if(userDoc.selectedActivity=="Physical Wellbeing"){
+       await sendActivityTypeTemplate(phone)
+    }
     return { status: true };
     }catch(err){
-        return res.status(500).json({message:"error in updateActivity"})
+        console.log("error in updateActivity");
     }
 }
