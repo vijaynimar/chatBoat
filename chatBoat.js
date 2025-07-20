@@ -1,7 +1,7 @@
 import "dotenv/config";
 import axios from "axios";
 
-const ACCESS_TOKEN = "EAAXDm2Rivn0BPAkz2keTVJDyJ1MblQcWM62NQ1CpdamhDcTBoig93NRLQ3NU8jAdrK3EbhfMpmdFwmgKB4qpdGUlOQgS3d29GTcXsXqcud1h4AoYL1JadubfrmA1ZCriTwc0QHjwZAhovpwsHyWGTlJRTcgNtNr5sXZArfTGYs3ewpgr9WoNoJ79A12qIn7CPh55H1BKdxxUMZBeLorEeOLt9IaSg5dtPZChxXz6y10ommwZDZD";
+const ACCESS_TOKEN = "EAAXDm2Rivn0BPLt1cqjoff0ZABaKz2pbm35C903YaZAeBPhBXfaXcl6pShG1ZA2flETGVHlAQKwZCvsYERtgi6rh0JZAQ7yAr5ZBKrZASlC8rnp1TuiaDPqnI63alHFYoiIwN3J3ptlBZAHFPwuA75ZACBbPs4gmicbvhVvYvXX8yuvn2Mxlvasugjve8gEhpcJAt69tWH4kZBmE6ya92ZBKzxXnwB8Gc53kLz1L7ZBOrH3u7xXRKgZDZD";
 const PHONE_NUMBER_ID = "639665239240564";
 
 export const sendTemplateMessage = async (RECIPIENT_PHONE) => {
@@ -102,7 +102,7 @@ export const sendTextMessage = async (recipientPhone, message) => {
     to: recipientPhone,
     type: "text",
     text: {
-      body: `Your response is ${message} recieved`
+      body: `This response is already tracked`
     }
   };
 
@@ -329,6 +329,70 @@ export const socialTemplate=async(recipientPhone)=>{
           sub_type: "quick_reply",
           index: "4",
           parameters: [{ type: "payload", payload: "social_e" }]
+        }
+      ]
+    }
+    }
+    try{
+       const res = await axios.post(url, data, {
+      headers: {
+        Authorization: `Bearer ${ACCESS_TOKEN}`,
+        "Content-Type": "application/json"
+      }
+    });
+    console.log("✅ Sent exercise type selection:", res.data);
+    }catch(err){
+      console.log("error in emotional template",err);
+    }
+}
+
+
+export const timeSlot=async(recipientPhone)=>{
+  console.log("line ");
+  const url=`https://graph.facebook.com/v19.0/${PHONE_NUMBER_ID}/messages`
+  const data = {
+    messaging_product: "whatsapp",
+    to: recipientPhone,
+    type: "template",
+    template: {
+      name: "timeslot", // 👈 Template name registered on WhatsApp Manager
+      language: { code: "en" },
+      components: [
+        {
+          type: "button",
+          sub_type: "quick_reply",
+          index: "0",
+          parameters: [{ type: "payload", payload: "timeslot_a" }]
+        },
+        {
+          type: "button",
+          sub_type: "quick_reply",
+          index: "1",
+          parameters: [{ type: "payload", payload: "timeslot_b" }]
+        },
+        {
+          type: "button",
+          sub_type: "quick_reply",
+          index: "2",
+          parameters: [{ type: "payload", payload: "timeslot_c" }]
+        },
+        {
+          type: "button",
+          sub_type: "quick_reply",
+          index: "3",
+          parameters: [{ type: "payload", payload: "timeslot_d" }]
+        },
+        {
+          type: "button",
+          sub_type: "quick_reply",
+          index: "4",
+          parameters: [{ type: "payload", payload: "timeslot_e" }]
+        },
+        {
+          type: "button",
+          sub_type: "quick_reply",
+          index: "5",
+          parameters: [{ type: "payload", payload: "timeslot_f" }]
         }
       ]
     }
