@@ -1,39 +1,46 @@
-import {user} from "./userModel.js"
-import connection from "./db.js"
-connection()
-import { sendTemplateMessage ,sendExerciseTypeTemplate,sendTextMessage,sendNutritionActivityTypeTemplate,sendActivityTypeTemplate,socialTemplate,emotionalTemplate,timeSlot} from "./chatBoat.js"
+import { user } from "./userModel.js";
+import connection from "./db.js";
+connection();
+import {
+  sendTemplateMessage,
+  sendExerciseTypeTemplate,
+  sendTextMessage,
+  sendNutritionActivityTypeTemplate,
+  sendActivityTypeTemplate,
+  socialTemplate,
+  emotionalTemplate,
+  timeSlot,
+} from "./chatBoat.js";
 
-export const createUser=async(req,res)=>{
-    const {phone,name,city} =req.body
-    try{
-        const phoneExist=await user.findOne({
-            phone:phone,
-            deletedAt:null
-        })
-        if(phoneExist){
-            return res.status(400).json({message:"This Phone number already exists"})
-        }
-        const newUser = new user({
-            phone,
-            name,
-            city,
-            activityOption: null,
-            timeSlot: null,
-            selectedActivity: null,
-        })
-        await newUser.save()
-        await sendTemplateMessage(phone)
-        return res.status(201).json({message:"user created sucessfully"})
-    }catch(err){
-        return res.status(500).json({message:"error in create user"})
+export const createUser = async (req, res) => {
+  const { phone, name, city } = req.body;
+  try {
+    const phoneExist = await user.findOne({
+      phone: phone,
+      deletedAt: null,
+    });
+    if (phoneExist) {
+      return res.status(400).json({ message: "This Phone number already exists" });
     }
-}
-
+    const newUser = new user({
+      phone,
+      name,
+      city,
+      activityOption: null,
+      timeSlot: null,
+      selectedActivity: null,
+    });
+    await newUser.save();
+    await sendTemplateMessage(phone);
+    return res.status(201).json({ message: "user created successfully" });
+  } catch (err) {
+    return res.status(500).json({ message: "error in create user" });
+  }
+};
 
 export const choosePath = async (req, res) => {
-  const VERIFY_TOKEN = "my_secret_token_987"; // replace with the token you set in Meta portal
+  const VERIFY_TOKEN = "my_secret_token_987";
 
-  // 1. Handle webhook verification (GET request)
   if (req.method === "GET") {
     const mode = req.query["hub.mode"];
     const token = req.query["hub.verify_token"];
@@ -47,7 +54,6 @@ export const choosePath = async (req, res) => {
     }
   }
 
-  // 2. Handle incoming messages (POST request)
   if (req.method === "POST") {
     try {
       const entry = req.body.entry?.[0];
@@ -61,182 +67,126 @@ export const choosePath = async (req, res) => {
         const update = await updateUser(userPhone);
         if (update.status) {
           await sendExerciseTypeTemplate(userPhone);
+          return res.send("success");
         }
       }
 
-        if (payload) {
-          const [template, option] = payload.split("_");
+      if (payload) {
+        const [template, option] = payload.split("_");
 
-          console.log("📩 User responded to template:", template);
-          console.log("✅ User chose option:", option);
+        console.log("📩 User responded to template:", template);
+        console.log("✅ User chose option:", option);
 
-          if (template === "activity") {
-            let activityLabel = "";
+        let activityLabel = "";
 
+        switch (template) {
+          case "activity":
             switch (option) {
-              case "a":
-                activityLabel = "Physical Wellbeing";
-                break;
-              case "b":
-                activityLabel = "Nutritional Wellbeing";
-                break;
-              case "c":
-                activityLabel = "Emotional Wellbeing";
-                break;
-              case "d":
-                activityLabel = "Social Wellbeing";
-                break;
+              case "a": activityLabel = "Physical Wellbeing"; break;
+              case "b": activityLabel = "Nutritional Wellbeing"; break;
+              case "c": activityLabel = "Emotional Wellbeing"; break;
+              case "d": activityLabel = "Social Wellbeing"; break;
             }
             if (activityLabel) {
               await updateActivity(userPhone, activityLabel);
+              return res.send("success");
             }
-          } else if (template === "physical") {
-              let activityLabel = "";
-              // You can store user's physical activity here
-              switch (option) {
-                case "a":
-                  activityLabel = "Yoga";
-                  break
-                case "b":
-                  activityLabel = "Sport";
-                  break;
-                case "c":
-                  activityLabel = "Walk";
-                  break;
-                case "d":
-                  activityLabel = "Walking/Jogging";
-                  break
-                case "e":
-                  activityLabel = "Workout";  
-                  break;
-              }
-              if (activityLabel) {
-                await updateActivityOption(userPhone, activityLabel); // create this function in your DB logic
-              }
-            
-          } else if (template === "emotional") {
-              let activityLabel = "";
-              // You can store user's physical activity here
-              switch (option) {
-                case "a":
-                  activityLabel = "Meditation";
-                  break;
-                case "b":
-                  activityLabel = "Breathing Exercise";
-                  break;
-                case "c":
-                  activityLabel = "Creative Hobby";
-                  break;
-                case "d":
-                  activityLabel = "Gratitude Journaling"; 
-                  break;
-              }
-              if (activityLabel) {
-                await updateActivityOption(userPhone, activityLabel); // create this function in your DB logic
-              }
-          }else if (template === "social") {
-              let activityLabel = "";
-              // You can store user's physical activity here
-              switch (option) {
-                case "a":
-                  activityLabel = "Social/Community";
-                  break;
-                case "b":
-                  activityLabel = "Volunteer";
-                  break;
-                case "c":
-                  activityLabel = "Family Time";
-                  break;
-                case "d":
-                  activityLabel = "Group Sport";
-                  break
-                case "e":
-                  activityLabel = "Social Initiatives";  
-                  break;
-              }
-              if (activityLabel) {
-                await updateActivityOption(userPhone, activityLabel); // create this function in your DB logic
-              }
-            }else if (template === "nutrition") {
-              let activityLabel = "";
-              // You can store user's physical activity here
-              switch (option) {
-                case "a":
-                  activityLabel = "Eat Rainbow of Vegetables";
-                  break;
-                case "b":
-                  activityLabel = "Wholesome Meals";
-                  break;
-                case "c":
-                  activityLabel = "Eliminate Processed Foods";
-                  break;
-                case "d":
-                  activityLabel = "Drink Water";
-                  break
-                case "e":
-                  activityLabel = "Mindfully for One Meal";  
-                  break;
-                case "f":
-                  activityLabel="Fast for 12 Hours"
-                  break  
-              }
-              if (activityLabel) {
-                await updateActivityOption(userPhone, activityLabel); // create this function in your DB logic
-              }
-            }else if (template === "timeslot") {
-              let activityLabel = "";
-              // You can store user's physical activity here
-              switch (option) {
-                case "a":
-                  activityLabel = "Morning 8:00 AM";
-                  break;
-                case "b":
-                  activityLabel = "Morning 9:00 AM";
-                  break;
-                case "c":
-                  activityLabel = "Morning 10:00 AM";
-                  break;
-                case "d":
-                  activityLabel = "Evening 8:00 PM";
-                  break
-                case "e":
-                  activityLabel = "Evening 9:00 PM";  
-                  break;
-                case "f":
-                  activityLabel="Evening 10:00 PM"
-                  break  
-              }
-              if (activityLabel) {
-                await updateTimeSlot(userPhone, activityLabel); // create this function in your DB logic
-              }
-            }
-        }
+            break;
 
-      return res.sendStatus(200);
+          case "physical":
+            switch (option) {
+              case "a": activityLabel = "Yoga"; break;
+              case "b": activityLabel = "Sport"; break;
+              case "c": activityLabel = "Walk"; break;
+              case "d": activityLabel = "Walking/Jogging"; break;
+              case "e": activityLabel = "Workout"; break;
+            }
+            if (activityLabel) {
+              await updateActivityOption(userPhone, activityLabel);
+              return res.send("success");
+            }
+            break;
+
+          case "emotional":
+            switch (option) {
+              case "a": activityLabel = "Meditation"; break;
+              case "b": activityLabel = "Breathing Exercise"; break;
+              case "c": activityLabel = "Creative Hobby"; break;
+              case "d": activityLabel = "Gratitude Journaling"; break;
+            }
+            if (activityLabel) {
+              await updateActivityOption(userPhone, activityLabel);
+              return res.send("success");
+            }
+            break;
+
+          case "social":
+            switch (option) {
+              case "a": activityLabel = "Social/Community"; break;
+              case "b": activityLabel = "Volunteer"; break;
+              case "c": activityLabel = "Family Time"; break;
+              case "d": activityLabel = "Group Sport"; break;
+              case "e": activityLabel = "Social Initiatives"; break;
+            }
+            if (activityLabel) {
+              await updateActivityOption(userPhone, activityLabel);
+              return res.send("success");
+            }
+            break;
+
+          case "nutrition":
+            switch (option) {
+              case "a": activityLabel = "Eat Rainbow of Vegetables"; break;
+              case "b": activityLabel = "Wholesome Meals"; break;
+              case "c": activityLabel = "Eliminate Processed Foods"; break;
+              case "d": activityLabel = "Drink Water"; break;
+              case "e": activityLabel = "Mindfully for One Meal"; break;
+              case "f": activityLabel = "Fast for 12 Hours"; break;
+            }
+            if (activityLabel) {
+              await updateActivityOption(userPhone, activityLabel);
+              return res.send("success");
+            }
+            break;
+
+          case "timeslot":
+            switch (option) {
+              case "a": activityLabel = "Morning 8:00 AM"; break;
+              case "b": activityLabel = "Morning 9:00 AM"; break;
+              case "c": activityLabel = "Morning 10:00 AM"; break;
+              case "d": activityLabel = "Evening 8:00 PM"; break;
+              case "e": activityLabel = "Evening 9:00 PM"; break;
+              case "f": activityLabel = "Evening 10:00 PM"; break;
+            }
+            if (activityLabel) {
+              await updateTimeSlot(userPhone, activityLabel);
+              return res.send("success");
+            }
+            break;
+        }
+      }
+
+      return res.send("success");
     } catch (err) {
       console.error("Webhook error:", err.message);
       return res.sendStatus(500);
     }
   }
 
-  // 3. Invalid method
   res.sendStatus(404);
 };
 
 const updateTimeSlot = async (phone, option) => {
   try {
     const userExist = await user.findOne({ phone });
-
     if (!userExist) {
       console.log("User not found");
       return { status: false, message: "User not found" };
     }
-
     if (userExist.timeSlot) {
       await sendTextMessage(phone);
-      return;
+      return { status: false, message: "Time slot already set" };
     }
-
     userExist.timeSlot = option;
     await userExist.save();
     return { status: true };
@@ -249,23 +199,17 @@ const updateTimeSlot = async (phone, option) => {
 const updateActivityOption = async (phone, option) => {
   try {
     const userExist = await user.findOne({ phone });
-
     if (!userExist) {
       console.log("User not found");
       return { status: false, message: "User not found" };
     }
-
     if (userExist.activityOption) {
       await sendTextMessage(phone);
-      return;
+      return { status: false, message: "Activity option already set" };
     }
-
     userExist.activityOption = option;
     await userExist.save();
-
-    // Ask user for time slot after setting activity option
     await timeSlot(phone);
-
     return { status: true };
   } catch (err) {
     console.log("Error in updateActivityOption:", err);
@@ -273,49 +217,52 @@ const updateActivityOption = async (phone, option) => {
   }
 };
 
-const updateUser=async(phone)=>{
-    try{
-        const userDoc = await user.findOne({ phone });
-
+const updateUser = async (phone) => {
+  try {
+    const userDoc = await user.findOne({ phone });
     if (!userDoc) {
       return { status: false, message: "User not found" };
     }
-
     userDoc.joined = true;
     await userDoc.save();
-
     return { status: true };
-    }catch(err){
-        console.log("error in updateUser");
-    }
-}
+  } catch (err) {
+    console.log("error in updateUser");
+    return { status: false, message: "Error in updateUser" };
+  }
+};
 
-const updateActivity=async(phone,activity)=>{
-    try{
-        const userDoc = await user.findOne({ phone });
+const updateActivity = async (phone, activity) => {
+  try {
+    const userDoc = await user.findOne({ phone });
     if (!userDoc) {
       return { status: false, message: "User not found" };
     }
-    if(userDoc.selectedActivity){
-      await sendTextMessage(phone)
-      return
+    if (userDoc.selectedActivity) {
+      await sendTextMessage(phone);
+      return { status: false, message: "Activity already selected" };
     }
     userDoc.selectedActivity = activity;
     await userDoc.save();
-    
-    if(userDoc.selectedActivity=="Physical Wellbeing"){
-       await sendActivityTypeTemplate(phone)
-    }else if(userDoc.selectedActivity=="Nutritional Wellbeing"){
-      await sendNutritionActivityTypeTemplate(phone)
-    }else if(userDoc.selectedActivity=="Emotional Wellbeing"){
-      await emotionalTemplate(phone)
-    }else if(userDoc.selectedActivity=="Social Wellbeing"){
-      await socialTemplate(phone)
+
+    switch (activity) {
+      case "Physical Wellbeing":
+        await sendActivityTypeTemplate(phone);
+        break;
+      case "Nutritional Wellbeing":
+        await sendNutritionActivityTypeTemplate(phone);
+        break;
+      case "Emotional Wellbeing":
+        await emotionalTemplate(phone);
+        break;
+      case "Social Wellbeing":
+        await socialTemplate(phone);
+        break;
     }
-    
+
     return { status: true };
-    }catch(err){
-        console.log("error in updateActivity",err);
-    }
-}
-updateActivity("919050328512")
+  } catch (err) {
+    console.log("error in updateActivity", err);
+    return { status: false, message: "Error in updateActivity" };
+  }
+};
