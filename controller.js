@@ -111,7 +111,7 @@ export const choosePath = async (req, res) => {
                   break;
               }
               if (activityLabel) {
-                await updateActivityOption(userPhone, option); // create this function in your DB logic
+                await updateActivityOption(userPhone, activityLabel); // create this function in your DB logic
               }
             
           } else if (template === "emotional") {
@@ -132,7 +132,7 @@ export const choosePath = async (req, res) => {
                   break;
               }
               if (activityLabel) {
-                await updateActivityOption(userPhone, option); // create this function in your DB logic
+                await updateActivityOption(userPhone, activityLabel); // create this function in your DB logic
               }
           }else if (template === "social") {
               let activityLabel = "";
@@ -155,7 +155,7 @@ export const choosePath = async (req, res) => {
                   break;
               }
               if (activityLabel) {
-                await updateActivityOption(userPhone, option); // create this function in your DB logic
+                await updateActivityOption(userPhone, activityLabel); // create this function in your DB logic
               }
             }else if (template === "nutrition") {
               let activityLabel = "";
@@ -181,7 +181,7 @@ export const choosePath = async (req, res) => {
                   break  
               }
               if (activityLabel) {
-                await updateActivityOption(userPhone, option); // create this function in your DB logic
+                await updateActivityOption(userPhone, activityLabel); // create this function in your DB logic
               }
             }else if (template === "timeslot") {
               let activityLabel = "";
@@ -207,7 +207,7 @@ export const choosePath = async (req, res) => {
                   break  
               }
               if (activityLabel) {
-                await updateTimeSlot(userPhone, option); // create this function in your DB logic
+                await updateTimeSlot(userPhone, activityLabel); // create this function in your DB logic
               }
             }
         }
@@ -318,3 +318,4 @@ const updateActivity=async(phone,activity)=>{
         console.log("error in updateActivity",err);
     }
 }
+updateActivity("919050328512")
