@@ -1,5 +1,7 @@
 import {user} from "./userModel.js"
-import { sendTemplateMessage ,sendExerciseTypeTemplate,sendTextMessage,sendNutritionActivityTypeTemplate,sendActivityTypeTemplate,socialTemplate} from "./chatBoat.js"
+import connection from "./db.js"
+connection()
+import { sendTemplateMessage ,sendExerciseTypeTemplate,sendTextMessage,sendNutritionActivityTypeTemplate,sendActivityTypeTemplate,socialTemplate,emotionalTemplate} from "./chatBoat.js"
 
 export const createUser=async(req,res)=>{
     const {phone,name,city} =req.body
@@ -121,14 +123,13 @@ const updateUser=async(phone)=>{
 const updateActivity=async(phone,activity)=>{
     try{
         const userDoc = await user.findOne({ phone });
-
     if (!userDoc) {
       return { status: false, message: "User not found" };
     }
 
     userDoc.selectedActivity = activity;
     await userDoc.save();
-    await sendTextMessage(phone,activity)
+    // await sendTextMessage(phone,activity)
     if(userDoc.selectedActivity=="Physical Wellbeing"){
        await sendActivityTypeTemplate(phone)
     }else if(userDoc.selectedActivity=="Nutritional Wellbeing"){
@@ -140,6 +141,6 @@ const updateActivity=async(phone,activity)=>{
     }
     return { status: true };
     }catch(err){
-        console.log("error in updateActivity");
+        console.log("error in updateActivity",err);
     }
 }
