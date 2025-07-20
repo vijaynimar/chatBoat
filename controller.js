@@ -16,7 +16,10 @@ export const createUser=async(req,res)=>{
         const newUser = new user({
             phone,
             name,
-            city
+            city,
+            activityOption: null,
+            timeSlot: null,
+            selectedActivity: null,
         })
         await newUser.save()
         await sendTemplateMessage(phone)
