@@ -290,6 +290,7 @@ export const emotionalTemplate=async(recipientPhone)=>{
 }
 
 export const socialTemplate=async(recipientPhone)=>{
+  console.log("line ");
   const url=`https://graph.facebook.com/v19.0/${PHONE_NUMBER_ID}/messages`
   const data = {
     messaging_product: "whatsapp",
@@ -326,10 +327,21 @@ export const socialTemplate=async(recipientPhone)=>{
         {
           type: "button",
           sub_type: "quick_reply",
-          index: "3",
+          index: "4",
           parameters: [{ type: "payload", payload: "social_e" }]
         }
       ]
     }
+    }
+    try{
+       const res = await axios.post(url, data, {
+      headers: {
+        Authorization: `Bearer ${ACCESS_TOKEN}`,
+        "Content-Type": "application/json"
+      }
+    });
+    console.log("✅ Sent exercise type selection:", res.data);
+    }catch(err){
+      console.log("error in emotional template",err);
     }
 }
