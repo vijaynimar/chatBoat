@@ -222,11 +222,11 @@ export const choosePath = async (req, res) => {
 const updateTimeSlot=async(phone,option)=>{
   try{
     const userExist=await user.findOne({phone})
-    if(userExist.activityOption){
+    if(userExist.timeSlot){
       await sendTextMessage(phone)
       return
     }
-    await user.updateOne({phone},{$set:{activityOption:option}})
+    await user.updateOne({phone},{$set:{timeSlot:option}})
     return{status:true}
   }catch(err){
     console.log("error in updateTimeSLot",err);
@@ -241,6 +241,7 @@ const updateActivityOption=async(phone,option)=>{
       return
     }
     await user.updateOne({phone:phone},{$set:{activityOption:option}})
+    await timeSlot(phone)
     return {status:true}
   }catch(err){
     console.log("error in update Activity option",err);
@@ -286,7 +287,7 @@ const updateActivity=async(phone,activity)=>{
     }else if(userDoc.selectedActivity=="Social Wellbeing"){
       await socialTemplate(phone)
     }
-    await timeSlot(phone)
+    
     return { status: true };
     }catch(err){
         console.log("error in updateActivity",err);
