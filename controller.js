@@ -1,7 +1,7 @@
 import {user} from "./userModel.js"
 import connection from "./db.js"
 connection()
-import { sendTemplateMessage ,sendExerciseTypeTemplate,sendTextMessage,sendNutritionActivityTypeTemplate,sendActivityTypeTemplate,socialTemplate,emotionalTemplate} from "./chatBoat.js"
+import { sendTemplateMessage ,sendExerciseTypeTemplate,sendTextMessage,sendNutritionActivityTypeTemplate,sendActivityTypeTemplate,socialTemplate,emotionalTemplate,timeSlot} from "./chatBoat.js"
 
 export const createUser=async(req,res)=>{
     const {phone,name,city} =req.body
@@ -84,11 +84,128 @@ export const choosePath = async (req, res) => {
                 activityLabel = "Social Wellbeing";
                 break;
             }
-
             if (activityLabel) {
               await updateActivity(userPhone, activityLabel);
             }
-          }
+          } else if (template === "physical") {
+              let activityLabel = "";
+              // You can store user's physical activity here
+              switch (option) {
+                case "a":
+                  activityLabel = "Yoga";
+                  break;
+                case "b":
+                  activityLabel = "Sport";
+                  break;
+                case "c":
+                  activityLabel = "Walk";
+                  break;
+                case "d":
+                  activityLabel = "Walking/Jogging";
+                  break
+                case "e":
+                  activityLabel = "Workout";  
+                  break;
+              }
+              if (activityLabel) {
+                await updateActivityOption(userPhone, option); // create this function in your DB logic
+              }
+            
+          } else if (template === "emotional") {
+              let activityLabel = "";
+              // You can store user's physical activity here
+              switch (option) {
+                case "a":
+                  activityLabel = "Meditation";
+                  break;
+                case "b":
+                  activityLabel = "Breathing Exercise";
+                  break;
+                case "c":
+                  activityLabel = "Creative Hobby";
+                  break;
+                case "d":
+                  activityLabel = "Gratitude Journaling"; 
+                  break;
+              }
+              if (activityLabel) {
+                await updateActivityOption(userPhone, option); // create this function in your DB logic
+              }
+          }else if (template === "social") {
+              let activityLabel = "";
+              // You can store user's physical activity here
+              switch (option) {
+                case "a":
+                  activityLabel = "Social/Community";
+                  break;
+                case "b":
+                  activityLabel = "Volunteer";
+                  break;
+                case "c":
+                  activityLabel = "Family Time";
+                  break;
+                case "d":
+                  activityLabel = "Group Sport";
+                  break
+                case "e":
+                  activityLabel = "Social Initiatives";  
+                  break;
+              }
+              if (activityLabel) {
+                await updateActivityOption(userPhone, option); // create this function in your DB logic
+              }
+            }else if (template === "nutrition") {
+              let activityLabel = "";
+              // You can store user's physical activity here
+              switch (option) {
+                case "a":
+                  activityLabel = "Eat Rainbow of Vegetables";
+                  break;
+                case "b":
+                  activityLabel = "Wholesome Meals";
+                  break;
+                case "c":
+                  activityLabel = "Eliminate Processed Foods";
+                  break;
+                case "d":
+                  activityLabel = "Drink Water";
+                case "e":
+                  activityLabel = "Mindfully for One Meal";  
+                  break;
+                case "f":
+                  activityLabel="Fast for 12 Hours"
+                  break  
+              }
+              if (activityLabel) {
+                await updateActivityOption(userPhone, option); // create this function in your DB logic
+              }
+            }else if (template === "timeslot") {
+              let activityLabel = "";
+              // You can store user's physical activity here
+              switch (option) {
+                case "a":
+                  activityLabel = "Morning 8:00 AM";
+                  break;
+                case "b":
+                  activityLabel = "Morning 9:00 AM";
+                  break;
+                case "c":
+                  activityLabel = "Morning 10:00 AM";
+                  break;
+                case "d":
+                  activityLabel = "Evening 8:00 PM";
+                  break
+                case "e":
+                  activityLabel = "Evening 9:00 PM";  
+                  break;
+                case "f":
+                  activityLabel="Evening 10:00 PM"
+                  break  
+              }
+              if (activityLabel) {
+                await updateTimeSlot(userPhone, option); // create this function in your DB logic
+              }
+            }
         }
 
       return res.sendStatus(200);
@@ -102,6 +219,33 @@ export const choosePath = async (req, res) => {
   res.sendStatus(404);
 };
 
+const updateTimeSlot=async(phone,option)=>{
+  try{
+    const userExist=await user.findOne({phone})
+    if(userExist.activityOption){
+      await sendTextMessage(phone)
+      return
+    }
+    await user.updateOne({phone},{$set:{activityOption:option}})
+    return{status:true}
+  }catch(err){
+    console.log("error in updateTimeSLot",err);
+  }
+}
+
+const updateActivityOption=async(phone,option)=>{
+  try{
+    const userExist=await user.findOne({phone:phone})
+    if(userExist.activityOption){
+      await sendTextMessage(phone)
+      return
+    }
+    await user.updateOne({phone:phone},{$set:{activityOption:option}})
+    return {status:true}
+  }catch(err){
+    console.log("error in update Activity option",err);
+  }
+}
 
 const updateUser=async(phone)=>{
     try{
@@ -126,10 +270,13 @@ const updateActivity=async(phone,activity)=>{
     if (!userDoc) {
       return { status: false, message: "User not found" };
     }
-
+    if(userDoc.selectedActivity){
+      await sendTextMessage(phone)
+      return
+    }
     userDoc.selectedActivity = activity;
     await userDoc.save();
-    // await sendTextMessage(phone,activity)
+    
     if(userDoc.selectedActivity=="Physical Wellbeing"){
        await sendActivityTypeTemplate(phone)
     }else if(userDoc.selectedActivity=="Nutritional Wellbeing"){
@@ -139,6 +286,7 @@ const updateActivity=async(phone,activity)=>{
     }else if(userDoc.selectedActivity=="Social Wellbeing"){
       await socialTemplate(phone)
     }
+    await timeSlot(phone)
     return { status: true };
     }catch(err){
         console.log("error in updateActivity",err);
