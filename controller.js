@@ -1,5 +1,5 @@
 import {user} from "./userModel.js"
-import { sendTemplateMessage ,sendExerciseTypeTemplate,sendTextMessage,sendNutritionActivityTypeTemplate,sendActivityTypeTemplate} from "./chatBoat.js"
+import { sendTemplateMessage ,sendExerciseTypeTemplate,sendTextMessage,sendNutritionActivityTypeTemplate,sendActivityTypeTemplate,socialTemplate} from "./chatBoat.js"
 
 export const createUser=async(req,res)=>{
     const {phone,name,city} =req.body
@@ -133,6 +133,10 @@ const updateActivity=async(phone,activity)=>{
        await sendActivityTypeTemplate(phone)
     }else if(userDoc.selectedActivity=="Nutritional Wellbeing"){
       await sendNutritionActivityTypeTemplate(phone)
+    }else if(userDoc.selectedActivity=="Emotional Wellbeing"){
+      await emotionalTemplate(phone)
+    }else if(userDoc.selectedActivity=="Social Wellbeing"){
+      await socialTemplate(phone)
     }
     return { status: true };
     }catch(err){
