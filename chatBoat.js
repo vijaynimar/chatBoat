@@ -103,7 +103,7 @@ export const sendTextMessage = async (recipientPhone, message) => {
     to: recipientPhone,
     type: "text",
     text: {
-      body: `This response is already tracked`
+      body: message
     }
   };
 
