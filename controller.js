@@ -1,6 +1,4 @@
 import { user } from "./userModel.js";
-import connection from "./db.js";
-connection();
 import {
   sendTemplateMessage,
   sendExerciseTypeTemplate,
@@ -10,6 +8,7 @@ import {
   socialTemplate,
   emotionalTemplate,
   timeSlot,
+  generateAndSendImage
 } from "./chatBoat.js";
 
 export const createUser = async (req, res) => {
@@ -190,6 +189,7 @@ const updateTimeSlot = async (phone, option) => {
     userExist.timeSlot = option;
     await userExist.save();
     await sendTextMessage(phone,"Thank you for taking up the initiative. #HealthyBeginnings")
+    await generateAndSendImage(phone)
     return { status: true };
   } catch (err) {
     console.log("Error in updateTimeSlot:", err);
